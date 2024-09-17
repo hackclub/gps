@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Get Location</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #coords {
+            font-size: 2em;
+            margin-bottom: 5px;
+            text-align: center;
+            word-break: break-all;
+        }
+        #coordsOrder {
+            font-size: 1em;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #555; /* A slightly gray color for subtlety */
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #message {
+            font-size: 1em;
+            margin-top: 10px;
+            color: green;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="coords">Loading...</div>
+    <div id="coordsOrder">Longitude, Latitude</div>
+    <button id="copyBtn">Copy</button>
+    <button id="refreshBtn">Refresh</button>
+    <div id="message"></div>
+
+    <script>
+        const coordsDiv = document.getElementById('coords');
+        const copyBtn = document.getElementById('copyBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const messageDiv = document.getElementById('message');
+        let lngLat = '';
+
+        function getLocation() {
+            coordsDiv.textContent = 'Loading...';
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                coordsDiv.textContent = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            lngLat = longitude + ',' + latitude;
+            coordsDiv.textContent = lngLat;
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    coordsDiv.textContent = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    coordsDiv.textContent = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    coordsDiv.textContent = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    coordsDiv.textContent = "An unknown error occurred.";
+                    break;
+            }
+        }
+
+        function showMessage(msg, isError = false) {
+            messageDiv.textContent = msg;
+            messageDiv.style.color = isError ? 'red' : 'green';
+            messageDiv.style.opacity = '1';
+            clearTimeout(messageDiv.timeout);
+            messageDiv.timeout = setTimeout(function() {
+                messageDiv.style.opacity = '0';
+            }, 2000);
+        }
+
+        copyBtn.addEventListener('click', function() {
+            if (!lngLat) return;
+            navigator.clipboard.writeText(lngLat).then(function() {
+                showMessage('Copied to clipboard');
+            }, function(err) {
+                showMessage('Could not copy text', true);
+            });
+        });
+
+        refreshBtn.addEventListener('click', function() {
+            getLocation();
+        });
+
+        // Initial location fetch
+        getLocation();
+
+    </script>
+
+</body>
+</html>
