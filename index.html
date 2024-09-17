@@ -3,36 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>Get Location</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile scaling -->
     <style>
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
         }
         #coords {
-            font-size: 2em;
+            font-size: 2rem;
             margin-bottom: 5px;
             text-align: center;
             word-break: break-all;
+            transition: opacity 0.5s;
+            opacity: 1;
         }
         #coordsOrder {
-            font-size: 1em;
+            font-size: 1rem;
             margin-bottom: 20px;
             text-align: center;
-            color: #555; /* A slightly gray color for subtlety */
+            color: #555;
         }
         button {
-            padding: 10px 20px;
-            font-size: 1em;
-            margin: 5px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            margin: 10px;
             cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #007BFF;
+        }
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
         }
         #message {
-            font-size: 1em;
+            font-size: 1rem;
             margin-top: 10px;
             color: green;
             opacity: 0;
@@ -44,7 +56,7 @@
 
     <div id="coords">Loading...</div>
     <div id="coordsOrder">Longitude, Latitude</div>
-    <button id="copyBtn">Copy</button>
+    <button id="copyBtn" disabled>Copy</button>
     <button id="refreshBtn">Refresh</button>
     <div id="message"></div>
 
@@ -54,11 +66,14 @@
         const refreshBtn = document.getElementById('refreshBtn');
         const messageDiv = document.getElementById('message');
         let lngLat = '';
+        let coordsTimeout;
 
         function getLocation() {
             coordsDiv.textContent = 'Loading...';
+            coordsDiv.style.opacity = '1'; // Ensure visibility
+            copyBtn.disabled = true; // Disable copy button until coordinates are fetched
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
+                navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true });
             } else {
                 coordsDiv.textContent = "Geolocation is not supported by this browser.";
             }
@@ -69,23 +84,35 @@
             const longitude = position.coords.longitude;
             lngLat = longitude + ',' + latitude;
             coordsDiv.textContent = lngLat;
+            copyBtn.disabled = false; // Enable copy button
+
+            // Fade out coordinates and disable copy after 30 seconds
+            clearTimeout(coordsTimeout);
+            coordsTimeout = setTimeout(function() {
+                coordsDiv.style.opacity = '0'; // Fade out
+                copyBtn.disabled = true; // Disable copy button
+            }, 30000); // 30 seconds
         }
 
         function showError(error) {
+            let errorMessage = '';
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    coordsDiv.textContent = "User denied the request for Geolocation.";
+                    errorMessage = "User denied the request for Geolocation.";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    coordsDiv.textContent = "Location information is unavailable.";
+                    errorMessage = "Location information is unavailable.";
                     break;
                 case error.TIMEOUT:
-                    coordsDiv.textContent = "The request to get user location timed out.";
+                    errorMessage = "The request to get user location timed out.";
                     break;
                 case error.UNKNOWN_ERROR:
-                    coordsDiv.textContent = "An unknown error occurred.";
+                    errorMessage = "An unknown error occurred.";
                     break;
             }
+            coordsDiv.textContent = errorMessage;
+            coordsDiv.style.opacity = '1';
+            copyBtn.disabled = true;
         }
 
         function showMessage(msg, isError = false) {
