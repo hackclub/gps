@@ -82,7 +82,7 @@
         function showPosition(position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
-            lngLat = longitude + ',' + latitude;
+            lngLat = latitude + ',' + longitude;
             coordsDiv.textContent = lngLat;
             copyBtn.disabled = false; // Enable copy button
 
