@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+!DOCTYPE html>
+<html lang="en" dir="ltr"> <!-- Added lang and dir attributes -->
 <head>
     <meta charset="UTF-8">
     <title>Get Location</title>
@@ -22,6 +22,7 @@
             word-break: break-all;
             transition: opacity 0.5s;
             opacity: 1;
+            direction: ltr; /* Ensure left-to-right text direction */
         }
         #coordsOrder {
             font-size: 1rem;
@@ -82,7 +83,7 @@
         function showPosition(position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
-            lngLat = longitude + ',' + latitude;
+            lngLat = longitude.toFixed(6) + ',' + latitude.toFixed(6); // Use toFixed to avoid locale issues
             coordsDiv.textContent = lngLat;
             copyBtn.disabled = false; // Enable copy button
 
