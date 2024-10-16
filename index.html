@@ -13,7 +13,7 @@
             min-height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #faefd6b3;  /* picked colors from a hackclub site */
         }
         #coords {
             font-size: 2rem;
@@ -35,14 +35,18 @@
             margin: 10px;
             cursor: pointer;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px;
             color: white;
-            background-color: #007BFF;
+            background-color: #FF8C37; /* picked colors from a hackclub site */
+        }
+        #refreshBtn{
+            background-color: #db6a19;
         }
         button:disabled {
             background-color: #999;
             cursor: not-allowed;
         }
+
         #message {
             font-size: 1rem;
             margin-top: 10px;
@@ -142,10 +146,10 @@
 
         function updatecoordinates() {
             if (reversecheckbox.checked) {
-                lngLat = latitude + ',' + longitude;
+                lngLat = latitude + ', ' + longitude;
                 coordsorder.textContent = 'Latitude, Longitude';
             } else {
-                lngLat = longitude + ',' + latitude;
+                lngLat = longitude + ', ' + latitude;
                 coordsorder.textContent = 'Longitude, Latitude';
             }
             coordsDiv.textContent = lngLat;
