@@ -50,12 +50,24 @@
             opacity: 0;
             transition: opacity 0.5s;
         }
+        #reverse-check {
+            margin: 15px;
+            display: flex;
+        }
+        #reverse-check label {
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
 
     <div id="coords">Loading...</div>
     <div id="coordsOrder">Longitude, Latitude</div>
+    <div id="reverse-check">
+        <input type="checkbox" id="reverse-checkbox">
+        <label for="reverse-checkbox">Reverse longitude and latitude</label>
+    </div>
+
     <button id="copyBtn" disabled>Copy</button>
     <button id="refreshBtn">Refresh</button>
     <div id="message"></div>
@@ -65,8 +77,12 @@
         const copyBtn = document.getElementById('copyBtn');
         const refreshBtn = document.getElementById('refreshBtn');
         const messageDiv = document.getElementById('message');
+        const coordsorder = document.getElementById('coordsOrder');
+        const reversecheckbox = document.getElementById('reverse-checkbox');
         let lngLat = '';
         let coordsTimeout;
+        let latitude = '';
+        let longitude = '';
 
         function getLocation() {
             coordsDiv.textContent = 'Loading...';
@@ -80,10 +96,9 @@
         }
 
         function showPosition(position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            lngLat = longitude + ',' + latitude;
-            coordsDiv.textContent = lngLat;
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
+            updatecoordinates();
             copyBtn.disabled = false; // Enable copy button
 
             // Fade out coordinates and disable copy after 30 seconds
@@ -125,6 +140,21 @@
             }, 2000);
         }
 
+        function updatecoordinates() {
+            if (reversecheckbox.checked) {
+                lngLat = latitude + ',' + longitude;
+                coordsorder.textContent = 'Latitude, Longitude';
+            } else {
+                lngLat = longitude + ',' + latitude;
+                coordsorder.textContent = 'Longitude, Latitude';
+            }
+            coordsDiv.textContent = lngLat;
+        }
+
+        reversecheckbox.addEventListener('change', function() {
+            updatecoordinates();
+        });
+
         copyBtn.addEventListener('click', function() {
             if (!lngLat) return;
             navigator.clipboard.writeText(lngLat).then(function() {
@@ -138,6 +168,7 @@
             getLocation();
         });
 
+        
         // Initial location fetch
         getLocation();
 
